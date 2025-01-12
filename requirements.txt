@@ -1,6 +1,7 @@
 boto3                    1.35.97
 langchain                0.3.14
 langchain-core           0.3.29
+langchain-openai         0.3.0
 langchain-text-splitters 0.3.5
 langgraph                0.2.62
 langgraph-checkpoint     2.0.9
