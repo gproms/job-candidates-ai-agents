@@ -20,7 +20,7 @@ except (FileNotFoundError, json.JSONDecodeError) as e:
 # Run query agent
 if profiles_candidates:
     print("\n===== Running Query Agent =====")
-    user_query = "Find 3 candidates with 1+ years of experience."
+    user_query = "Find all candidates with experience in Agile methodologies."
     filtered_results = interpret_and_filter_profiles(user_query, profiles_candidates)
 
     if filtered_results:

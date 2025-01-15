@@ -55,49 +55,36 @@ def interpret_and_filter_profiles(query: str, profiles: Dict) -> Dict:
 
     # Prompt for the agent
     prompt = f"""
-    You are an assistant that writes Python functions to filter profiles from a given dataset.
+    You are a Python assistant that writes code to filter or rank profiles from a given dataset.
     The dataset is a JSON object where keys are candidate IDs and values are profiles.
-    Each profile has fields like "Experience", "Education", "Skills", and "Summary".
 
-    ### Rules for Writing Code:
-    1. Always return a Python function named `filter_profiles`.
-    2. The function should take one required parameter: `profiles` (the dataset).
-    3. Optionally, if the query specifies a maximum number of results, the function should include an additional parameter `max_results` with a default value of `None`. 
-       - If `max_results` is provided, limit the results to that number.
-       - If `max_results` is `None`, return all matching profiles.
-    4. Use proper Python syntax, including indentation.
-    5. Use a loop and conditional statements to filter profiles.
-    6. Ensure the function returns a dictionary of filtered profiles.
+    The user can ask any query about the dataset, such as:
+    - "Find candidates with 4+ years of experience in AI or Python."
+    - "Find the candidate with the most years of work experience."
+    - "Find all candidates with experience in Agile methodologies."
 
-    ### Example Query:
-    - Query: "Find one candidate with 4+ years of experience in AI or Python."
-    - Function Output:
-    def filter_profiles(profiles, max_results=1):
+    ### Instructions:
+    1. Write a Python function named `filter_profiles` that processes the dataset to answer the query.
+    2. Your function must take one parameter: `profiles` (the dataset).
+    3. If applicable, your function can take additional parameters based on the query (e.g., `max_results` or a condition).
+    4. Use the fields in the dataset like `Experience`, `Education`, `Skills`, and `Summary`.
+    5. Ensure your function handles missing fields gracefully using `.get()`.
+
+    ### Example Input Query:
+    - Query: "Find candidates with 4+ years of experience in AI or Python."
+
+    ### Example Output Code:
+    def filter_profiles(profiles):
         filtered_profiles = {{}}
-        count = 0
         for key, value in profiles.items():
             if any(exp.get("duration_years", 0) >= 4 for exp in value.get("Experience", [])) and (
                 "AI" in value.get("Skills", []) or "Python" in value.get("Skills", [])
             ):
                 filtered_profiles[key] = value
-                count += 1
-                if max_results and count >= max_results:
-                    break
         return filtered_profiles
 
-    ### Example Query Without a Limit:
-    - Query: "Find all candidates with 4 years of experience."
-    - Function Output:
-    def filter_profiles(profiles, max_results=None):
-        filtered_profiles = {{}}
-        for key, value in profiles.items():
-            if any(exp.get("duration_years", 0) == 4 for exp in value.get("Experience", [])):
-                filtered_profiles[key] = value
-        return filtered_profiles
-
-    Write Python code to filter profiles based on this query:
+    Write a Python function to answer this query:
     Query: {query}
-    Respond with only the code. Ensure the function uses proper indentation and handles the `max_results` parameter as optional.
     """
 
     # Send prompt to LLM
