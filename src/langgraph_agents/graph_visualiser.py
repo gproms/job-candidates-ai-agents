@@ -1,7 +1,6 @@
 from langgraph.graph import StateGraph
 from graphviz import Digraph
 
-
 def visualise_graph(graph: StateGraph, output_path: str = "graph"):
     """
     Visualise the StateGraph using Graphviz.
