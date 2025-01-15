@@ -1,70 +1,34 @@
 import os
 import json
-from utils.file_loader import load_text_files, load_json
-from langgraph_agents.profile_agent import load_or_generate_profiles
-from langgraph_agents.search_agent import search_candidates
-# from langgraph_agents.nodes import cv_parser_node, linkedin_parser_node, interview_summarizer_node, synthesize_profiles
+from langgraph_agents.query_agent import interpret_and_filter_profiles, validate_and_convert_profiles
+from utils.file_loader import export_to_json
 from src import DATA_DIR
 
-def export_to_json(data, filename="search_results.json"):
-    """
-    Export data to a JSON file.
-    """
-    with open(filename, "w") as json_file:
-        json.dump(data, json_file, indent=2)
-    print(f"Data exported to {filename}")
+# Paths
+PROFILES_JSON_PATH = os.path.join(DATA_DIR, "profiles_candidates.json")
+QUERY_RESULTS_PATH = os.path.join(DATA_DIR, "query_results.json")
 
+try:
+    # Load profiles
+    print("Loading profiles from cached JSON...")
+    with open(PROFILES_JSON_PATH, "r") as f:
+        profiles_candidates = validate_and_convert_profiles(json.load(f))
+except (FileNotFoundError, json.JSONDecodeError) as e:
+    print(f"Error loading profiles: {e}")
+    profiles_candidates = {}
 
-# Load data
-cv_data = load_text_files(os.path.join(DATA_DIR, "cvs"))
-interview_data = load_text_files(os.path.join(DATA_DIR, "interviews"))
-linkedin_data = load_json(os.path.join(DATA_DIR, "linkedin_profiles.json"))
+# Run query agent
+if profiles_candidates:
+    print("\n===== Running Query Agent =====")
+    user_query = "Find 3 candidates with 1+ years of experience."
+    filtered_results = interpret_and_filter_profiles(user_query, profiles_candidates)
 
+    if filtered_results:
+        print("\n=== Query Results ===")
+        print(json.dumps(filtered_results, indent=2))
+    else:
+        print("\n=== No Results Found ===")
 
-# state = {
-#     "cv_data": cv_data,
-#     "linkedin_data": linkedin_data,
-#     "interview_data": interview_data,
-# }
-#
-# # Run nodes
-# print("\n===== Running CV Parser Node =====")
-# cv_results = cv_parser_node(state)
-# assert cv_results["cv_data"] is not None, "CV parsing failed!"
-#
-# print("\n===== Running LinkedIn Parser Node =====")
-# linkedin_results = linkedin_parser_node(state)
-# assert linkedin_results["linkedin_data"] is not None, "LinkedIn parsing failed!"
-#
-# print("\n===== Running Interview Summarizer Node =====")
-# interview_results = interview_summarizer_node(state)
-# assert interview_results["interview_data"] is not None, "Interview summarization failed!"
-
-
-# Step 1: Generate or Load Profiles
-# print("\n===== Running Synthesis Node =====")
-# profiles_candidates = synthesize_profiles(
-#     cv_results["cv_data"],
-#     linkedin_results["linkedin_data"],
-#     interview_results["interview_data"]
-# )
-# export_to_json(profiles_candidates, "profiles_candidates.json")
-
-profiles_candidates = load_or_generate_profiles(
-    cv_data, linkedin_data, interview_data, regenerate=False
-)
-
-# Step 2: Search Candidates
-print("\n===== Running Search =====")
-query = "Find candidates with up to 4 years of experience in Python."
-results = search_candidates(query, profiles_candidates, top_n=10)
-
-# Step 3: Export Results
-export_to_json(results, "search_results.json")
-
-# Display Results
-print("Search Results:")
-for candidate_id, profile in results.items():
-    print(f"Candidate ID: {candidate_id}")
-    print(f"Summary: {profile['Summary']}")
-    print(json.dumps(profile, indent=2))
+    export_to_json(filtered_results, QUERY_RESULTS_PATH)
+else:
+    print("No profiles available for querying.")
