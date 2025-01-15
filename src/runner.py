@@ -42,7 +42,7 @@ linkedin_data = load_json(os.path.join(DATA_DIR, "linkedin_profiles.json"))
 
 
 # Step 1: Generate or Load Profiles
-print("\n===== Running Synthesis Node =====")
+# print("\n===== Running Synthesis Node =====")
 # profiles_candidates = synthesize_profiles(
 #     cv_results["cv_data"],
 #     linkedin_results["linkedin_data"],
