@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph_agents.prompts import SYNTHESIS_PROMPT
@@ -16,6 +17,7 @@ logging.basicConfig(
 # Initialize LLM
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
 
+DEFAULT_JSON_PATH = "profiles_candidates.json"
 
 def synthesize_profiles(cv_data, linkedin_data, interview_data):
     """
@@ -48,3 +50,20 @@ def synthesize_profiles(cv_data, linkedin_data, interview_data):
 
     logging.info("Profile Synthesis complete.")
     return synthesized_profiles
+
+
+def load_or_generate_profiles(cv_data, linkedin_data, interview_data, regenerate=False, json_path=DEFAULT_JSON_PATH):
+    """
+    Loads profiles from a JSON file or regenerates them if specified.
+    """
+    if not regenerate and os.path.exists(json_path):
+        logging.info(f"Loading profiles from {json_path}")
+        with open(json_path, "r") as f:
+            return json.load(f)
+
+    logging.info("Generating new profiles...")
+    profiles = synthesize_profiles(cv_data, linkedin_data, interview_data)
+    with open(json_path, "w") as f:
+        json.dump(profiles, f, indent=2)
+    logging.info(f"Profiles saved to {json_path}")
+    return profiles
