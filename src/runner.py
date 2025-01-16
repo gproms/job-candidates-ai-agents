@@ -8,27 +8,20 @@ from src import DATA_DIR
 PROFILES_JSON_PATH = os.path.join(DATA_DIR, "profiles_candidates.json")
 QUERY_RESULTS_PATH = os.path.join(DATA_DIR, "query_results.json")
 
-try:
-    # Load profiles
-    print("Loading profiles from cached JSON...")
-    with open(PROFILES_JSON_PATH, "r") as f:
-        profiles_candidates = validate_and_convert_profiles(json.load(f))
-except (FileNotFoundError, json.JSONDecodeError) as e:
-    print(f"Error loading profiles: {e}")
-    profiles_candidates = {}
+# Load profiles
+print("Loading profiles from cached JSON...")
+with open(PROFILES_JSON_PATH, "r") as f:
+    profiles_candidates = validate_and_convert_profiles(json.load(f))
 
 # Run query agent
-if profiles_candidates:
-    print("\n===== Running Query Agent =====")
-    user_query = "Find all candidates with experience in Agile methodologies."
-    filtered_results = interpret_and_filter_profiles(user_query, profiles_candidates)
+print("\n===== Running Query Agent =====")
+user_query = "Find candidates having either Java skills less than 5 years work experience. Also find any candidates having Scrum and Agile"
+filtered_results = interpret_and_filter_profiles(user_query, profiles_candidates)
 
-    if filtered_results:
-        print("\n=== Query Results ===")
-        print(json.dumps(filtered_results, indent=2))
-    else:
-        print("\n=== No Results Found ===")
-
-    export_to_json(filtered_results, QUERY_RESULTS_PATH)
+if filtered_results:
+    print("\n=== Query Results ===")
+    print(json.dumps(filtered_results, indent=2))
 else:
-    print("No profiles available for querying.")
+    print("\n=== No Results Found ===")
+
+export_to_json(filtered_results, QUERY_RESULTS_PATH)
