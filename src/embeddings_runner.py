@@ -1,46 +1,41 @@
 import os
 import json
-from langgraph_agents.embeddings_agent import (
-    preprocess_and_embed_profiles,
-    embed_query,
-    search_profiles,
-)
-from utils.file_loader import load_json, export_to_json
+from langgraph_agents.embeddings_agent import EmbeddingsAgent
+from utils.file_loader import export_to_json
 from src import DATA_DIR
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Paths
 PROFILES_JSON_PATH = os.path.join(DATA_DIR, "profiles_candidates.json")
 QUERY_RESULTS_PATH = os.path.join(DATA_DIR, "query_results_embeddings.json")
 
-def main():
-    # Load profiles
-    print("Loading profiles from cached JSON...")
-    profiles = load_json(PROFILES_JSON_PATH)
+# Load profiles
+print("Loading profiles from cached JSON...")
+with open(PROFILES_JSON_PATH, "r") as f:
+    profiles_candidates = json.load(f)
 
-    # Preprocess and embed profiles
-    print("Generating profile embeddings...")
-    profile_embeddings = preprocess_and_embed_profiles(profiles)
+# Initialize the EmbeddingsAgent
+agent = EmbeddingsAgent()
 
-    # User query
-    user_query = input("Enter your query: ")
-    print(f"Processing query: {user_query}")
+# Define the query
+# user_query = "Find candidates with 4 years work experience"
+user_query = "Find a candidate with 4 years work experience"
 
-    # Embed query
-    query_embedding = embed_query(user_query)
+# Run the embedding search
+print("\n===== Running Embeddings Search =====")
+top_k = 1  # Number of results to retrieve
+filtered_results = agent.search(user_query, profiles_candidates, top_k=top_k)
 
-    # Search profiles
-    print("Searching profiles...")
-    top_results = search_profiles(query_embedding, profile_embeddings, top_k=1)
+# Output results
+if filtered_results:
+    print("\n=== Query Results ===")
+    print(json.dumps(filtered_results, indent=2))
+else:
+    print("\n=== No Results Found ===")
 
-    # Display results
-    if top_results:
-        print("\n=== Query Results ===")
-        print(json.dumps(top_results, indent=2))
-    else:
-        print("\n=== No Results Found ===")
-
-    # Save results
-    export_to_json(top_results, QUERY_RESULTS_PATH)
-
-if __name__ == "__main__":
-    main()
+# Export results
+export_to_json(filtered_results, QUERY_RESULTS_PATH)
+print(f"Results saved to {QUERY_RESULTS_PATH}")

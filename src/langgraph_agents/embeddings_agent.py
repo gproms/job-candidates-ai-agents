@@ -1,56 +1,67 @@
-import numpy as np
+import logging
+from typing import Dict, List, Tuple
 from langchain_openai import OpenAIEmbeddings
 from sklearn.metrics.pairwise import cosine_similarity
-from dotenv import load_dotenv
+import numpy as np
 
-# Load environment variables
-load_dotenv()
+# Logger setup
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
-# Initialize embeddings model
-embedding_model = OpenAIEmbeddings()
+class EmbeddingsAgent:
+    def __init__(self):
+        # Initialize the embeddings model
+        self.embeddings_model = OpenAIEmbeddings()
 
-def preprocess_profile_text(profile):
-    """
-    Preprocess a single profile to create a text representation.
-    Combines 'Summary', 'Skills', and 'Experience' fields into a single text block.
-    Converts all text to lowercase for uniformity.
-    """
-    summary = profile.get("Summary", "").lower()  # Convert to lowercase
-    skills = " ".join(profile.get("Skills", [])).lower()  # Convert to lowercase
-    experiences = " ".join(exp.get("description", "").lower() for exp in profile.get("Experience", []))
-    return f"{summary} {skills} {experiences}"
+    def generate_embedding(self, text: str) -> np.ndarray:
+        """
+        Generate embeddings for a given text.
+        """
+        try:
+            embedding = self.embeddings_model.embed_query(text)
+            return np.array(embedding)
+        except Exception as e:
+            logger.error(f"Error generating embedding for text: {text}\n{e}")
+            return np.zeros((1536,))  # Return zero-vector if embedding fails
 
+    def search(self, query: str, profiles: Dict, top_k: int = 1) -> Dict:
+        """
+        Search for the top-k most relevant profiles based on the query using cosine similarity.
 
-def preprocess_and_embed_profiles(profiles):
-    """
-    Preprocess profiles and compute their embeddings.
-    Returns a dictionary with candidate IDs as keys and embeddings as values.
-    """
-    embeddings = {}
-    for candidate_id, profile in profiles.items():
-        text_representation = preprocess_profile_text(profile)
-        embedding = embedding_model.embed_query(text_representation)
-        embeddings[candidate_id] = {
-            "profile": profile,
-            "embedding": embedding,
-        }
-    return embeddings
+        Args:
+            query (str): User search query.
+            profiles (Dict): Candidate profiles.
+            top_k (int): Number of top results to return.
 
-def embed_query(query):
-    """
-    Generate an embedding vector for the user's query.
-    Converts query to lowercase for consistency with profile embeddings.
-    """
-    return embedding_model.embed_query(query.lower())
+        Returns:
+            Dict: A dictionary of the top-k matching profiles.
+        """
+        # Generate query embedding
+        query_embedding = self.generate_embedding(query)
 
+        # Generate embeddings for candidate summaries
+        profile_embeddings = []
+        profile_ids = []
+        for candidate_id, profile in profiles.items():
+            summary = profile.get("Summary", "")
+            if summary:
+                embedding = self.generate_embedding(summary)
+                profile_embeddings.append(embedding)
+                profile_ids.append(candidate_id)
+            else:
+                logger.warning(f"Profile {candidate_id} missing Summary field.")
 
-def search_profiles(query_embedding, profile_embeddings, top_k=1):
-    """
-    Search for the top_k most similar profiles based on cosine similarity.
-    """
-    candidate_ids = list(profile_embeddings.keys())
-    embeddings = np.array([profile_embeddings[cid]["embedding"] for cid in candidate_ids])
-    similarities = cosine_similarity([query_embedding], embeddings)[0]
-    top_indices = similarities.argsort()[-top_k:][::-1]
-    results = {candidate_ids[i]: profile_embeddings[candidate_ids[i]]["profile"] for i in top_indices}
-    return results
+        if not profile_embeddings:
+            logger.warning("No valid profiles with embeddings.")
+            return {}
+
+        # Compute cosine similarities
+        profile_embeddings = np.stack(profile_embeddings)
+        similarities = cosine_similarity([query_embedding], profile_embeddings).flatten()
+
+        # Get top-k matches
+        top_indices = np.argsort(similarities)[::-1][:top_k]
+        top_results = {profile_ids[i]: profiles[profile_ids[i]] for i in top_indices}
+
+        logger.info(f"Top-{top_k} profiles retrieved based on embeddings.")
+        return top_results
