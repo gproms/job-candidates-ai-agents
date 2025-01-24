@@ -1,67 +1,129 @@
 import logging
-from typing import Dict, List, Tuple
-from langchain_openai import OpenAIEmbeddings
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
+from typing import Dict, List
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
+from dotenv import load_dotenv
 
-# Logger setup
+# Load environment variables from .env file
+load_dotenv()
+
+# Initialize Logger
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-class EmbeddingsAgent:
-    def __init__(self):
-        # Initialize the embeddings model
-        self.embeddings_model = OpenAIEmbeddings()
 
-    def generate_embedding(self, text: str) -> np.ndarray:
+class EmbeddingsAgent:
+    """
+    Agent for generating embeddings and matching profiles to user queries.
+    """
+
+    def __init__(self, vectorstore_path: str = None):
         """
-        Generate embeddings for a given text.
+        Initialize the EmbeddingsAgent.
+
+        :param vectorstore_path: Path to an existing FAISS vectorstore. If None, a new store will be created.
+        """
+        self.embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
+        self.vectorstore = (
+            FAISS.load_local(vectorstore_path, self.embeddings)
+            if vectorstore_path
+            else None
+        )
+
+    def _generate_profile_text(self, profile: Dict) -> str:
+        """
+        Generate a structured text from a candidate profile for embedding generation.
+
+        :param profile: A dictionary representing the candidate's profile.
+        :return: A string summarizing the candidate's profile.
         """
         try:
-            embedding = self.embeddings_model.embed_query(text)
-            return np.array(embedding)
+            name = profile.get("name", "Unknown")
+            years_of_experience = sum(
+                float(exp.get("duration_years", 0))
+                for exp in profile.get("Experience", [])
+                if exp.get("duration_years", " ") not in ["unknown", None]
+            )
+            companies = ", ".join(
+                exp.get("company", "Unknown")
+                for exp in profile.get("Experience", [])
+                if "company" in exp
+            )
+            roles = ", ".join(
+                exp.get("title", " ") for exp in profile.get("Experience", [])
+            )
+            degrees = ", ".join(
+                edu.get("degree", " ") for edu in profile.get("Education", [])
+            )
+            skills = ", ".join(profile.get("Skills", []))
+
+            return (
+                f"{name} has {years_of_experience:.1f} years of experience, worked at {companies}, "
+                f"held roles such as {roles}, has degrees like {degrees}, and skills including {skills}."
+            )
         except Exception as e:
-            logger.error(f"Error generating embedding for text: {text}\n{e}")
-            return np.zeros((1536,))  # Return zero-vector if embedding fails
+            logger.error(f"Error generating profile text: {e}")
+            return "Unknown profile summary."
 
-    def search(self, query: str, profiles: Dict, top_k: int = 1) -> Dict:
+    def generate_embeddings(self, profiles: Dict) -> FAISS:
         """
-        Search for the top-k most relevant profiles based on the query using cosine similarity.
+        Generate embeddings for profiles and store them in a FAISS vectorstore.
 
-        Args:
-            query (str): User search query.
-            profiles (Dict): Candidate profiles.
-            top_k (int): Number of top results to return.
-
-        Returns:
-            Dict: A dictionary of the top-k matching profiles.
+        :param profiles: A dictionary of candidate profiles.
+        :return: A FAISS vectorstore containing the embeddings.
         """
-        # Generate query embedding
-        query_embedding = self.generate_embedding(query)
+        profile_data = [
+            {
+                "id": candidate_id,
+                "text": self._generate_profile_text(profile),
+            }
+            for candidate_id, profile in profiles.items()
+        ]
+        texts = [entry["text"] for entry in profile_data]
+        metadatas = [{"id": entry["id"]} for entry in profile_data]
 
-        # Generate embeddings for candidate summaries
-        profile_embeddings = []
-        profile_ids = []
-        for candidate_id, profile in profiles.items():
-            summary = profile.get("Summary", "")
-            if summary:
-                embedding = self.generate_embedding(summary)
-                profile_embeddings.append(embedding)
-                profile_ids.append(candidate_id)
-            else:
-                logger.warning(f"Profile {candidate_id} missing Summary field.")
+        self.vectorstore = FAISS.from_texts(texts, self.embeddings, metadatas)
+        self.vectorstore.save_local("vectorstore")
+        logger.info("Embeddings successfully generated and stored in vectorstore.")
+        return self.vectorstore
 
-        if not profile_embeddings:
-            logger.warning("No valid profiles with embeddings.")
-            return {}
+    def generate_query_embedding(self, query: str) -> List[float]:
+        """
+        Generate an embedding for the user query.
 
-        # Compute cosine similarities
-        profile_embeddings = np.stack(profile_embeddings)
-        similarities = cosine_similarity([query_embedding], profile_embeddings).flatten()
+        :param query: The user query as a string.
+        :return: A list of floats representing the query embedding.
+        """
+        try:
+            return self.embeddings.embed_query(query)
+        except Exception as e:
+            logger.error(f"Error generating query embedding: {e}")
+            return []
 
-        # Get top-k matches
-        top_indices = np.argsort(similarities)[::-1][:top_k]
-        top_results = {profile_ids[i]: profiles[profile_ids[i]] for i in top_indices}
+    def find_best_match(self, profiles: Dict, query: str, top_k: int = 1) -> List[Dict]:
+        """
+        Find the best matching profiles for a user query using cosine similarity.
 
-        logger.info(f"Top-{top_k} profiles retrieved based on embeddings.")
-        return top_results
+        :param profiles: A dictionary of candidate profiles.
+        :param query: The user query as a string.
+        :param top_k: The number of top matches to return.
+        :return: A list of dictionaries containing the best matches and their similarity scores.
+        """
+        if not self.vectorstore:
+            logger.info("Generating embeddings as vectorstore is not initialized.")
+            self.generate_embeddings(profiles)
+
+        query_embedding = self.generate_query_embedding(query)
+
+        if not query_embedding:
+            logger.error("Failed to generate query embedding.")
+            return []
+
+        # Perform similarity search
+        results = self.vectorstore.similarity_search_with_score(query, k=top_k)
+        top_matches = [
+            {"profile": profiles[res.metadata["id"]], "similarity": score}
+            for res, score in results
+        ]
+
+        return top_matches
