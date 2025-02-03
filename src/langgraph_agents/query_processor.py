@@ -70,16 +70,22 @@ def llm_refinement_agent(state):
     
     messages = [
         SystemMessage(content="""You are a candidate matching expert. Your task is to:
-        1. For the experience requirement of 4 years:
-           - Include candidates with exactly 4 years of experience
-           - Include candidates with 'around 4 years' or '4+ years' of experience
-           - Do not include candidates with significantly more or less experience
-        2. Look for experience mentions in both Summary and Experience sections
-        3. Return matching candidates in their original JSON structure
+        1. Analyze the search criteria in the parsed query
+        2. For experience requirements:
+           - Handle exact matches (e.g., "4 years")
+           - Handle ranges (e.g., "more than 3 years", "less than 5 years")
+           - Look in both Summary and Experience sections
+        3. For education requirements:
+           - Check degrees (PhD, Masters, Bachelors, etc.)
+           - Check fields of study
+        4. For skills requirements:
+           - Match required skills with candidate's skills
+           - Consider both exact matches and related skills
+        5. Handle multiple criteria with proper logical operations
         
-        IMPORTANT: Return ONLY the JSON object, no markdown formatting, no ```json tags, no other text.
+        IMPORTANT: Return ONLY the JSON object with matching candidates, no markdown formatting, no ```json tags, no other text.
         Example format: {"candidate_id": {"name": "...", "Summary": "..."}}"""),
-        HumanMessage(content=f"Find candidates with 4 years experience.\nCriteria: {json.dumps(parsed_query)}\nCandidates: {json.dumps(candidates)}")
+        HumanMessage(content=f"Find matching candidates.\nCriteria: {json.dumps(parsed_query)}\nCandidates: {json.dumps(candidates)}")
     ]
     
     print("\nRefinement Step:")
@@ -158,7 +164,8 @@ def load_profiles(file_path):
 
 def main():
     profiles = load_profiles('/Users/jproms/projects/job-candidates-ai-agents/data/profiles_candidates2.json')
-    natural_language_query = "Find a candidate with 4 years of work experience"
+    natural_language_query = "Find a candidate with less than 4 years of work experience"
+    # natural_language_query = "Find a candidate with a PhD"
     results = execute_query(natural_language_query, profiles)
     
     print("Query Results:")
