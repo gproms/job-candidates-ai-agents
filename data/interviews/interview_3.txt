@@ -1,0 +1,21 @@
+Interviewer: What is your role as a Product Manager?
+Clara: I lead cross-functional teams of 10–12 members to deliver high-impact products using Agile and Scrum methodologies. Recently, I successfully launched a flagship product that increased user retention by 35%.
+Interviewer: What is your educational background?
+Clara: I earned an MBA from Prestige University in 2015, where I focused on digital product management and strategic leadership.
+Interviewer: What projects have you managed?
+Clara: I've managed a range of projects, including a mobile app redesign for a tech startup and a SaaS platform for a financial services company. I focus on aligning product strategy with user needs and business goals to drive successful product launches.
+Interviewer: How do you approach product development?
+Clara: My approach involves defining product vision, prioritizing features, and collaborating with design and engineering teams to deliver high-quality products. I emphasize user feedback, data-driven decision-making, and iterative development to ensure product-market fit.
+Interviewer: How do you stay updated on industry trends?
+Clara: I stay updated through industry reports, market research, and networking with other product managers. I also attend product management conferences and webinars to learn about emerging trends and best practices in the field.
+Interviewer: What are your career goals as a Product Manager?
+Clara: My long-term goal is to become a VP of Product and lead product strategy for a global tech company. I aspire to drive innovation, build high-performing teams, and deliver products that have a positive impact on users and businesses.
+Interviewer: What motivates you as a Product Manager?
+Clara: I am motivated by the opportunity to solve complex problems, collaborate with diverse teams, and create products that improve people's lives. I find fulfillment in delivering products that meet user needs, drive business growth, and drive positive change in the market.
+Interviewer: How do you approach product roadmapping and prioritization?
+Clara: Product roadmapping involves defining product goals, outlining features, and setting timelines for development. Prioritization involves evaluating features based on user impact, business value, and technical feasibility. I use frameworks like RICE scoring and Kano model to prioritize features
+and align them with strategic objectives.
+Interviewer: Can you explain a complex product concept to a non-technical audience?
+Clara: Sure! Let's take the example of a subscription-based service like Netflix. A subscription-based service allows users to access content for a recurring fee, similar to a magazine or newspaper subscription. It provides users with unlimited access to a library of movies, TV shows, and original
+content, without the need to purchase or download individual titles.
+

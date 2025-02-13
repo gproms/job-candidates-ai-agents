@@ -1,0 +1,7 @@
+Bob Smith
+Software Engineer
+Skills: Java, Spring Boot, AWS
+Experience:
+- Software Engineer at StartupX: 4 years
+Education:
+- BSc in Software Engineering, Tech University, 2016

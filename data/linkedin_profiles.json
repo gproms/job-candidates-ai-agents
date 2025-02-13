@@ -1,0 +1,102 @@
+[
+    {
+        "name": "Alice Johnson",
+        "headline": "Data Scientist at TechCorp",
+        "skills": ["Python", "Machine Learning", "TensorFlow"],
+        "experience": [
+            {
+                "title": "Data Scientist",
+                "company": "TechCorp",
+                "duration": "3 years",
+                "description": "Developed predictive models using Python and TensorFlow."
+            }
+        ],
+        "education": [
+            {
+                "degree": "MSc in Data Science",
+                "institution": "University of Data",
+                "year_graduated": 2018
+            }
+        ]
+    },
+    {
+        "name": "Bob Smith",
+        "headline": "Software Engineer at StartupX",
+        "skills": ["Java", "Spring Boot", "AWS"],
+        "experience": [
+            {
+                "title": "Software Engineer",
+                "company": "StartupX",
+                "duration": "4 years",
+                "description": "Built scalable backend systems using Spring Boot and AWS."
+            }
+        ],
+        "education": [
+            {
+                "degree": "BSc in Software Engineering",
+                "institution": "Tech University",
+                "year_graduated": 2016
+            }
+        ]
+    },
+    {
+        "name": "Clara Lee",
+        "headline": "Product Manager at Innovate Inc.",
+        "skills": ["Agile", "Scrum", "Leadership"],
+        "experience": [
+            {
+                "title": "Product Manager",
+                "company": "Innovate Inc.",
+                "duration": "5 years",
+                "description": "Led cross-functional teams to deliver high-impact products."
+            }
+        ],
+        "education": [
+            {
+                "degree": "MBA in Business Administration",
+                "institution": "Prestige University",
+                "year_graduated": 2015
+            }
+        ]
+    },
+    {
+        "name": "David Brown",
+        "headline": "AI Researcher at DeepTech Labs",
+        "skills": ["Python", "AI", "Deep Learning"],
+        "experience": [
+            {
+                "title": "AI Researcher",
+                "company": "DeepTech Labs",
+                "duration": "2 years",
+                "description": "Conducted research on state-of-the-art AI models."
+            }
+        ],
+        "education": [
+            {
+                "degree": "PhD in Artificial Intelligence",
+                "institution": "AI Research Institute",
+                "year_graduated": 2021
+            }
+        ]
+    },
+    {
+        "name": "Emma White",
+        "headline": "UX Designer at Creatify Studio",
+        "skills": ["Figma", "User Research", "Prototyping"],
+        "experience": [
+            {
+                "title": "UX Designer",
+                "company": "Creatify Studio",
+                "duration": "4 years",
+                "description": "Designed user-friendly interfaces for web and mobile applications."
+            }
+        ],
+        "education": [
+            {
+                "degree": "BA in Graphic Design",
+                "institution": "Design School",
+                "year_graduated": 2017
+            }
+        ]
+    }
+]

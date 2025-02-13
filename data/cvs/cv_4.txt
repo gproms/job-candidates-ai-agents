@@ -1,0 +1,7 @@
+David Brown
+AI Researcher
+Skills: Python, AI, Deep Learning
+Experience:
+- AI Researcher at DeepTech Labs: 2 years
+Education:
+- PhD in Artificial Intelligence, AI Research Institute, 2021

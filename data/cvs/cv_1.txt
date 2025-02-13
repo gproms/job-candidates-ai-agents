@@ -1,0 +1,7 @@
+Alice Johnson
+Data Scientist
+Skills: Python, Machine Learning, TensorFlow
+Experience:
+- Data Scientist at TechCorp: 3 years
+Education:
+- MSc in Data Science, University of Data, 2018
