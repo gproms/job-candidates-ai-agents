@@ -43,24 +43,19 @@ def vector_search_agent(state):
     """Agent that performs vector search to find relevant candidates"""
     profiles = state['profiles']
     query = state['query']
+    num_candidates = state.get('num_candidates', 5)  # Configurable, default to 5
     
     # Create embeddings for profiles and query
     profile_embeddings = [embedding_model.encode(p['Summary']) for p in profiles.values()]
     query_embedding = embedding_model.encode(query)
     
-    # Perform vector search - increased from 3 to 5 candidates
+    # Perform vector search
     index = faiss.IndexFlatL2(len(query_embedding))
     index.add(np.array(profile_embeddings))
-    D, I = index.search(query_embedding.reshape(1, -1), 5)  # Increased to 5
+    D, I = index.search(query_embedding.reshape(1, -1), num_candidates)
     
     # Get top candidates
     state['candidates'] = {list(profiles.keys())[i]: profiles[list(profiles.keys())[i]] for i in I[0]}
-    
-    print("\nVector Search Step:")
-    print(f"Number of candidates found: {len(state['candidates'])}")
-    print("Candidates found:")
-    for cid, profile in state['candidates'].items():
-        print(f"- {cid}: {profile['Summary'][:100]}...")
     return state
 
 def llm_refinement_agent(state):
@@ -140,20 +135,19 @@ def create_agent_workflow():
     
     return workflow.compile()
 
-def execute_query(query: str, profiles: Dict):
+def execute_query(query: str, profiles: Dict, num_candidates: int = 5):
     """Execute the query using the agent workflow"""
     workflow = create_agent_workflow()
     
-    # Initialize state
     state = {
         "query": query,
         "profiles": profiles,
         "parsed_query": None,
         "candidates": None,
-        "results": None
+        "results": None,
+        "num_candidates": num_candidates
     }
     
-    # Run the workflow
     final_state = workflow.invoke(state)
     return final_state['results']
 
@@ -164,8 +158,8 @@ def load_profiles(file_path):
 
 def main():
     profiles = load_profiles('/Users/jproms/projects/job-candidates-ai-agents/data/profiles_candidates2.json')
-    natural_language_query = "Find a candidate with less than 4 years of work experience"
-    # natural_language_query = "Find a candidate with a PhD"
+    # natural_language_query = "Find a candidate with less than 4 years of work experience"
+    natural_language_query = "Find just one candidate with Python skills"
     results = execute_query(natural_language_query, profiles)
     
     print("Query Results:")
