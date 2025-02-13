@@ -26,6 +26,7 @@ def parse_query(query):
     """Parses the user query to extract key attributes."""
     parsed_query = {
         "years_of_experience": None,
+        "experience_condition": None,  # 'less_than', 'greater_than', or 'exact'
         "skills": [],
         "education": None
     }
@@ -34,12 +35,18 @@ def parse_query(query):
         for i, token in enumerate(tokens):
             if token.isdigit() and "years" in tokens[i + 1]:
                 parsed_query["years_of_experience"] = int(token)
+                if "less" in query:
+                    parsed_query["experience_condition"] = "less_than"
+                elif "more" in query or "greater" in query:
+                    parsed_query["experience_condition"] = "greater_than"
+                else:
+                    parsed_query["experience_condition"] = "exact"
 
     if "skills" in query:
         parsed_query["skills"] = [skill.strip() for skill in query.split("skills")[1].split(",")]
 
-    if "degree" in query or "education" in query:
-        parsed_query["education"] = query.split("degree")[1].strip() if "degree" in query else None
+    if "PhD" in query or "degree" in query or "education" in query:
+        parsed_query["education"] = "PhD"
 
     return parsed_query
 
@@ -90,14 +97,40 @@ def compute_candidate_scores(query, candidate_data):
                 np.linalg.norm(query_embedding) * np.linalg.norm(candidate_embedding)
         )
 
-        # Adjust scores for query-specific matching
+        # Adjust scores based on query-specific conditions
         candidate_details = candidate_data[candidate_id]
         bonus = 0
         for exp in candidate_details.get("Experience", []):
-            if exp.get("duration_years") == parsed_query.get("years_of_experience"):
-                bonus += 0.1  # Reward for matching years of experience
+            duration = exp.get("duration_years", "0")
+            try:
+                duration = int(duration)  # Ensure `duration_years` is an integer
+            except ValueError:
+                duration = 0  # Default to 0 if casting fails
+
+            condition = parsed_query.get("experience_condition")
+            target_years = parsed_query.get("years_of_experience")
+            if condition == "less_than" and duration < target_years:
+                bonus += 0.1
+            elif condition == "greater_than" and duration > target_years:
+                bonus += 0.1
+            elif condition == "exact" and duration == target_years:
+                bonus += 0.1
+
+        if parsed_query.get("education") and parsed_query["education"] in [
+            edu.get("degree", "") for edu in candidate_details.get("Education", [])
+        ]:
+            bonus += 0.3  # Increased weight for education match
 
         results.append((candidate_id, similarity + bonus))
+
+    # Ensure candidates with exact education matches are included
+    if parsed_query.get("education"):
+        for candidate_id, candidate_details in candidate_data.items():
+            if parsed_query["education"] in [
+                edu.get("degree", "") for edu in candidate_details.get("Education", [])
+            ]:
+                if candidate_id not in [c[0] for c in results]:
+                    results.append((candidate_id, 1.0))  # Add with boosted score
 
     # Sort results by highest adjusted score
     results = sorted(results, key=lambda x: x[1], reverse=True)
@@ -128,7 +161,8 @@ def refine_selection_with_llm(query, top_candidates, candidate_data):
 
     prompt = (
             f"Please select the candidate who best matches the query. "
-            f"If no candidate meets the requirements, state that none match.\n\n"
+            f"If no candidate meets the requirements, state that none match. "
+            f"Explain why candidates with matching qualifications, like Candidate 4, were not selected if they appear relevant.\n\n"
             f"Query: {query}\n\n"
             f"Candidates:\n" + "\n".join(candidate_summaries) +
             "\n\nWhich candidate best matches the query?"

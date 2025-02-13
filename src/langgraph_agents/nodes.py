@@ -1,12 +1,12 @@
 import json
 import logging
+from typing import List, Dict
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from dotenv import load_dotenv
 from langgraph_agents.prompts import CV_PROMPT, LINKEDIN_PROMPT, INTERVIEW_PROMPT, SYNTHESIS_PROMPT
 
 logging.basicConfig(
-    # filename="debug_log.txt",
     level=logging.INFO,  # Change to DEBUG for detailed logs
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
@@ -79,38 +79,102 @@ def interview_summarizer_node(state):
         response = model.invoke(messages)
         try:
             summarized_interviews[key] = json.loads(response.content)
-            # parsed_data = json.loads(response.content)
-            # summarized_interviews[key] = {
-            #     "name": parsed_data.get("name", "Unknown Candidate"),
-            #     "Experience": parsed_data.get("Experience", "No Experience"),
-            #     "Education": parsed_data.get("Education", {}),
-            #     "Skills": parsed_data.get("Skills", [])
-            # }
         except json.JSONDecodeError:
             logging.error(f"Failed to parse interview data for {key}. Response: {response.content}")
-            # summarized_interviews[key] = {
-            #     "name": "Unknown Candidate on interview_summarizer_node",
-            #     "Experience": ["Parsing failed on interview_summarizer_node."],
-            #     "Education": {"error": "Parsing failed on interview_summarizer_node."},
-            #     "Skills": []
-            # }
             summarized_interviews[key] = {"error on interview_summarizer_node": "Failed to parse"}
 
     state["interview_data"] = summarized_interviews
     logging.info("Interview Summarization complete.")
     return {"interview_data": summarized_interviews}
 
+def normalize_skills(skills: List[str]) -> List[str]:
+    """
+    Normalize skill names to ensure consistency.
+    """
+    skill_mapping = {
+        "ai": "Artificial Intelligence",
+        "ml": "Machine Learning",
+        "dl": "Deep Learning",
+        "nlp": "Natural Language Processing",
+        "ux": "User Experience",
+        "ui": "User Interface",
+    }
+    normalized_skills = set()
+    for skill in skills:
+        skill = skill.strip().lower()
+        if skill in skill_mapping:
+            normalized_skills.add(skill_mapping[skill])
+        else:
+            normalized_skills.add(skill.title())  # Capitalize first letter
+    return sorted(normalized_skills)
 
+def add_source_to_field(field_data, cv_entry, linkedin_entry, interview_entry, field_name):
+    """
+    Add source tracking to a field (e.g., Experience or Education).
+    """
+    updated_field = []
+    for entry in field_data:
+        sources = []
+        # Check if the entry exists in the CV data
+        cv_items = cv_entry.get(field_name, [])
+        if isinstance(cv_items, list):
+            for cv_item in cv_items:
+                if isinstance(cv_item, dict) and isinstance(entry, dict) and entry.items() <= cv_item.items():
+                    sources.append("CV")
+                elif isinstance(cv_item, str) and isinstance(entry, dict) and str(entry) == cv_item:
+                    sources.append("CV")
+                elif isinstance(cv_item, str) and isinstance(entry, str) and entry == cv_item:
+                    sources.append("CV")
+        # Check if the entry exists in the LinkedIn data
+        linkedin_items = linkedin_entry.get(field_name, [])
+        if isinstance(linkedin_items, list):
+            for linkedin_item in linkedin_items:
+                if isinstance(linkedin_item, dict) and isinstance(entry, dict) and entry.items() <= linkedin_item.items():
+                    sources.append("LinkedIn")
+                elif isinstance(linkedin_item, str) and isinstance(entry, dict) and str(entry) == linkedin_item:
+                    sources.append("LinkedIn")
+                elif isinstance(linkedin_item, str) and isinstance(entry, str) and entry == linkedin_item:
+                    sources.append("LinkedIn")
+        # Check if the entry exists in the Interview data
+        interview_items = interview_entry.get(field_name, [])
+        if isinstance(interview_items, list):
+            for interview_item in interview_items:
+                if isinstance(interview_item, dict) and isinstance(entry, dict) and entry.items() <= interview_item.items():
+                    sources.append("Interview")
+                elif isinstance(interview_item, str) and isinstance(entry, dict) and str(entry) == interview_item:
+                    sources.append("Interview")
+                elif isinstance(interview_item, str) and isinstance(entry, str) and entry == interview_item:
+                    sources.append("Interview")
+        entry["source"] = sources
+        updated_field.append(entry)
+    return updated_field
 
-# Synthesize Profiles Node
+def add_source_to_skills(skills, cv_entry, linkedin_entry, interview_entry):
+    """
+    Add source tracking to skills.
+    """
+    updated_skills = []
+    for skill in skills:
+        sources = []
+        if skill in cv_entry.get("Skills", []):
+            sources.append("CV")
+        if skill in linkedin_entry.get("Skills", []):
+            sources.append("LinkedIn")
+        if skill in interview_entry.get("Skills", []):
+            sources.append("Interview")
+        updated_skills.append({"skill": skill, "source": sources})
+    return updated_skills
+
 def synthesize_profiles(cv_data, linkedin_data, interview_data):
+    """
+    Combines CVs, LinkedIn profiles, and interviews into unified profiles.
+    """
     logging.info("Starting Profile Synthesis.")
     synthesized_profiles = {}
 
-    # for key, content in state.get("cv_data", {}).items():
     for candidate_id, cv_entry in cv_data.items():
-        linkedin_entry = linkedin_data[candidate_id]
-        interview_entry = interview_data[candidate_id]
+        linkedin_entry = linkedin_data.get(candidate_id, {})
+        interview_entry = interview_data.get(candidate_id, {})
 
         content = {
             "cv": cv_entry,
@@ -124,12 +188,22 @@ def synthesize_profiles(cv_data, linkedin_data, interview_data):
         ]
         response = model.invoke(messages)
         try:
-            synthesized_profiles[candidate_id] = json.loads(response.content)
+            profile = json.loads(response.content)
+            # Normalize skills
+            if "Skills" in profile:
+                profile["Skills"] = normalize_skills(profile["Skills"])
+            # Ensure Education is a list of dictionaries
+            if "Education" in profile and isinstance(profile["Education"], dict):
+                profile["Education"] = [profile["Education"]]
+            # Add source tracking for each field
+            profile["Experience"] = add_source_to_field(profile.get("Experience", []), cv_entry, linkedin_entry, interview_entry, "Experience")
+            profile["Education"] = add_source_to_field(profile.get("Education", []), cv_entry, linkedin_entry, interview_entry, "Education")
+            profile["Skills"] = add_source_to_skills(profile.get("Skills", []), cv_entry, linkedin_entry, interview_entry)
+            synthesized_profiles[candidate_id] = profile
         except json.JSONDecodeError:
             logging.error(f"Failed to combine the 3 sources for {candidate_id}. Response: {response.content}")
             synthesized_profiles[candidate_id] = {"error": "Failed to combine the 3 sources on synthesize_profiles"}
 
-    # state["cv_data"] = parsed_cvs
     logging.info("ProfilesSynthesis of 3 sources complete.")
     return synthesized_profiles
 

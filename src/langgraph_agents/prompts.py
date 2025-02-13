@@ -33,12 +33,13 @@ You're excellent at combining information from multiple sources all coming in JS
 1. Merge work experiences. If there are redundant entries for the same job, combine them into a single summary.
 2. Merge academic qualifications. If there are redundant entries for the same qualification, combine them in order to have one single entry per studies (where each entry can have its own degree, institution and year, deuplicating when necessary).
 3. Merge skills (combine and deduplicate when necessary).
-4. Summary: Generate a brief summary for this candidate, describing in one single sentence its work experiences, academic qualifications and skills.
+4. Summary: Generate a brief summary for this candidate, describing in one single sentence its work experiences, academic qualifications and top 3-5 most relevant skills.
 Be careful not to confuse work experience with education (you can rely on the linkedin JSON to clarify what what is work experience or education, like company vs university names and other).
-If you're adding multiple entries for work experience or education, verify that they do belong to different positions or studies, and not just repeated entries. 
+If you're adding multiple entries for work experience or education, verify that they do belong to different positions or studies, and not just repeated entries.
 If repeated entries, merge them into a single one. You can also cross verify with the number of entries that appear on the CV or linkedin JSONs, to make sure you're not adding repeated entries.
 This is particularly true if the number of work experience entries, or education entries, on the JSONs from CV or linkedin, differ with the number of entries on the final output, you can cross check to try to make them match in number of entries.
 Make sure the duration_years is not in str format but rather in int or float.
 Deduplicate any duplications you may find on any field, such as the lists of skills or anything else that may be repeated. This deduplication is case insensitive, so "Python" and "python" are considered the same skill and you can keep just one of them.
-Respond in JSON format with fields: "name", "Experience", "Education", "Skills". If you don't have any information, leave the field empty or use unknown as value, remember that. Respond in JSON format for each candidate with fields: "name", "Summary", "Experience", "Education", "Skills". If you don't have any information, leave the field empty, and you can use unknown value only if the value was unknown on all of the sources.
+Respond in JSON format with fields: "name", "Summary", "Experience", "Education", "Skills". If you don't have any information, leave the field empty, and you can use unknown value only if the value was unknown on all of the sources.
 """
+

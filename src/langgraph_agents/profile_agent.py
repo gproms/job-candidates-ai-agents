@@ -1,69 +1,59 @@
 import json
 import logging
-import os
+from typing import Dict
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
-from langgraph_agents.prompts import SYNTHESIS_PROMPT
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-# Initialize LLM
+# Initialize OpenAI model
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
 
-DEFAULT_JSON_PATH = "profiles_candidates.json"
+# Logger setup
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
-def synthesize_profiles(cv_data, linkedin_data, interview_data):
+def query_profiles(query: str, profiles: Dict) -> Dict:
     """
-    Combines CVs, LinkedIn profiles, and interviews into unified profiles.
+    Query the synthesized profiles based on a user query.
     """
-    logging.info("Starting Profile Synthesis.")
-    synthesized_profiles = {}
+    logging.info(f"Querying profiles with query: {query}")
+    filtered_profiles = {}
 
-    for candidate_id, cv_entry in cv_data.items():
-        linkedin_entry = linkedin_data.get(candidate_id, {})
-        interview_entry = interview_data.get(candidate_id, {})
-
-        content = {
-            "cv": cv_entry,
-            "linkedin": linkedin_entry,
-            "interview": interview_entry
-        }
-
+    for candidate_id, profile in profiles.items():
+        # Check if the profile matches the query
         messages = [
-            SystemMessage(content=SYNTHESIS_PROMPT),
-            HumanMessage(content=json.dumps(content))
+            SystemMessage(content="Answer True if the profile matches the query, else False."),
+            HumanMessage(content=f"Query: {query}\nProfile: {json.dumps(profile)}")
         ]
-
         response = llm.invoke(messages)
-        try:
-            synthesized_profiles[candidate_id] = json.loads(response.content)
-        except json.JSONDecodeError:
-            logging.error(f"Failed to synthesize profile for {candidate_id}. Response: {response.content}")
-            synthesized_profiles[candidate_id] = {"error": "Failed to synthesize profile"}
+        is_match = response.content.strip().lower() == "true"
+        if is_match:
+            filtered_profiles[candidate_id] = profile
 
-    logging.info("Profile Synthesis complete.")
-    return synthesized_profiles
+    logging.info(f"Found {len(filtered_profiles)} matching profiles.")
+    return filtered_profiles
 
-
-def load_or_generate_profiles(cv_data, linkedin_data, interview_data, regenerate=False, json_path=DEFAULT_JSON_PATH):
+def refine_profiles(profiles: Dict) -> Dict:
     """
-    Loads profiles from a JSON file or regenerates them if specified.
+    Refine the synthesized profiles (e.g., deduplicate, normalize).
     """
-    if not regenerate and os.path.exists(json_path):
-        logging.info(f"Loading profiles from {json_path}")
-        with open(json_path, "r") as f:
-            return json.load(f)
+    logging.info("Refining profiles.")
+    refined_profiles = {}
 
-    logging.info("Generating new profiles...")
-    profiles = synthesize_profiles(cv_data, linkedin_data, interview_data)
-    with open(json_path, "w") as f:
-        json.dump(profiles, f, indent=2)
-    logging.info(f"Profiles saved to {json_path}")
-    return profiles
+    for candidate_id, profile in profiles.items():
+        # Deduplicate skills
+        if "Skills" in profile:
+            profile["Skills"] = list(set(profile["Skills"]))
+        # Normalize experience and education entries
+        if "Experience" in profile:
+            profile["Experience"] = [dict(t) for t in {tuple(d.items()) for d in profile["Experience"]}]
+        if "Education" in profile:
+            profile["Education"] = [dict(t) for t in {tuple(d.items()) for d in profile["Education"]}]
+        refined_profiles[candidate_id] = profile
+
+    logging.info("Profiles refined.")
+    return refined_profiles
+
