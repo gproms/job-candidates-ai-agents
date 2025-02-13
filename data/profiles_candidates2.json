@@ -1,0 +1,450 @@
+{
+  "candidate_4": {
+    "name": "David Brown",
+    "Summary": "AI Researcher with 2 years of experience at DeepTech Labs and AI Research Institute, holding a PhD in Artificial Intelligence. Proficient in Python, AI, Deep Learning, Transformer Models, Natural Language Processing, Reinforcement Learning, Data Preprocessing, Model Selection, Hyperparameter Tuning, Model Evaluation, AI Trends Research, Model Explainability, AI Model Deployment, Model Monitoring, Problem-Solving, Critical Thinking, Data Analysis, and Communication.",
+    "Experience": [
+      {
+        "title": "AI Researcher",
+        "company": "DeepTech Labs",
+        "duration_years": 2,
+        "description": "Worked as an AI Researcher at DeepTech Labs for 2 years. Conducted research on state-of-the-art AI models.",
+        "source": []
+      },
+      {
+        "title": "AI Researcher",
+        "company": "AI Research Institute",
+        "duration_years": "unknown",
+        "description": "Conducting research on state-of-the-art AI models, focusing on deep learning and Python frameworks. Applying transformer models for natural language processing in healthcare data analysis.",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "title": "Project Leader",
+        "company": "unknown",
+        "duration_years": "unknown",
+        "description": "Leading projects on AI-driven chatbots for customer service and computer vision applications for autonomous vehicles. Developing scalable and efficient AI solutions for real-world challenges.",
+        "source": [
+          "Interview"
+        ]
+      }
+    ],
+    "Education": [
+      {
+        "degree": "PhD in Artificial Intelligence",
+        "institution": "AI Research Institute",
+        "year": 2021,
+        "source": [
+          "LinkedIn"
+        ]
+      }
+    ],
+    "Skills": [
+      {
+        "skill": "Ai Model Deployment",
+        "source": []
+      },
+      {
+        "skill": "Ai Trends Research",
+        "source": []
+      },
+      {
+        "skill": "Artificial Intelligence",
+        "source": []
+      },
+      {
+        "skill": "Communication",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Critical Thinking",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Data Analysis",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Data Preprocessing",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Deep Learning",
+        "source": [
+          "CV",
+          "LinkedIn",
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Hyperparameter Tuning",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Model Evaluation",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Model Explainability",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Model Monitoring",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Model Selection",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Natural Language Processing",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Problem-Solving",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Python",
+        "source": [
+          "CV",
+          "LinkedIn",
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Reinforcement Learning",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Transformer Models",
+        "source": [
+          "Interview"
+        ]
+      }
+    ]
+  },
+  "candidate_5": {
+    "name": "Emma White",
+    "Summary": "Experienced UX Designer with 4 years of experience designing user-friendly interfaces for web and mobile applications at Creatify Studio, holding a BA in Graphic Design from Design School. Proficient in Figma, User Research, Prototyping, User Interface Design, Wireframing, User Testing, Design Thinking, and Accessibility Design.",
+    "Experience": [
+      {
+        "title": "UX Designer",
+        "company": "Creatify Studio",
+        "duration_years": 4,
+        "description": "Responsible for designing user experiences, utilizing skills in Figma, User Research, and Prototyping. Designed user-friendly interfaces for web and mobile applications. Specializes in designing user-friendly web and mobile applications that prioritize accessibility and responsive design. Worked on projects including a mobile app for a local charity organization and a web platform for an e-commerce startup.",
+        "source": []
+      }
+    ],
+    "Education": [
+      {
+        "degree": "BA in Graphic Design",
+        "institution": "Design School",
+        "year": 2017,
+        "source": [
+          "LinkedIn"
+        ]
+      }
+    ],
+    "Skills": [
+      {
+        "skill": "Accessibility Design",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Design Thinking",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Figma",
+        "source": [
+          "CV",
+          "LinkedIn",
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Prototyping",
+        "source": [
+          "CV",
+          "LinkedIn",
+          "Interview"
+        ]
+      },
+      {
+        "skill": "User Interface Design",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "User Research",
+        "source": [
+          "CV",
+          "LinkedIn",
+          "Interview"
+        ]
+      },
+      {
+        "skill": "User Testing",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Wireframing",
+        "source": [
+          "Interview"
+        ]
+      }
+    ]
+  },
+  "candidate_1": {
+    "name": "Alice Johnson",
+    "Summary": "Experienced Data Scientist with 3 years of experience developing predictive models using Python, TensorFlow, and working on financial forecasting, fraud detection, and customer segmentation. Holds an MSc in Data Science from the University of Data.",
+    "Experience": [
+      {
+        "title": "Data Scientist",
+        "company": "TechCorp",
+        "duration_years": 3,
+        "description": "Worked as a Data Scientist at TechCorp for 3 years. Developed predictive models using Python and TensorFlow. Also worked on financial forecasting, fraud detection, and customer segmentation.",
+        "source": []
+      }
+    ],
+    "Education": [
+      {
+        "degree": "MSc in Data Science",
+        "institution": "University of Data",
+        "year": 2018,
+        "source": [
+          "LinkedIn"
+        ]
+      }
+    ],
+    "Skills": [
+      {
+        "skill": "Feature Engineering",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Machine Learning",
+        "source": [
+          "CV",
+          "LinkedIn",
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Model Evaluation",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Predictive Modeling",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Python",
+        "source": [
+          "CV",
+          "LinkedIn",
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Tensorflow",
+        "source": []
+      }
+    ]
+  },
+  "candidate_2": {
+    "name": "Bob Smith",
+    "Summary": "Experienced Software Engineer with 4 years of experience in developing scalable backend systems using Java, Spring Boot, and AWS, specializing in optimizing cloud-based workflows and implementing CI/CD pipelines.",
+    "Experience": [
+      {
+        "title": "Software Engineer",
+        "company": "StartupX",
+        "duration_years": 4,
+        "description": "Worked as a Software Engineer at StartupX for 4 years. Built scalable backend systems using Spring Boot and AWS. Specializing in optimizing cloud-based workflows and implementing CI/CD pipelines. Worked on projects including microservices architecture for a fintech startup and a data analytics platform for a healthcare provider. Enjoys building robust and scalable systems.",
+        "source": []
+      }
+    ],
+    "Education": [
+      {
+        "degree": "BSc in Software Engineering",
+        "institution": "Tech University",
+        "year": 2016,
+        "source": [
+          "LinkedIn"
+        ]
+      }
+    ],
+    "Skills": [
+      {
+        "skill": "Agile Methodologies",
+        "source": []
+      },
+      {
+        "skill": "Attention To Detail",
+        "source": []
+      },
+      {
+        "skill": "Aws",
+        "source": []
+      },
+      {
+        "skill": "Ci/Cd Pipelines Implementation",
+        "source": []
+      },
+      {
+        "skill": "Cloud-Based Workflows Optimization",
+        "source": []
+      },
+      {
+        "skill": "Collaboration",
+        "source": [
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Continuous Integration",
+        "source": []
+      },
+      {
+        "skill": "Java",
+        "source": [
+          "CV",
+          "LinkedIn",
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Problem-Solving",
+        "source": []
+      },
+      {
+        "skill": "Spring Boot",
+        "source": [
+          "CV",
+          "LinkedIn",
+          "Interview"
+        ]
+      },
+      {
+        "skill": "Test-Driven Development",
+        "source": []
+      }
+    ]
+  },
+  "candidate_3": {
+    "name": "Clara Lee",
+    "Summary": "Experienced Product Manager with 5 years of experience leading cross-functional teams to deliver high-impact products, implementing Agile and Scrum methodologies, and providing leadership. Holds an MBA in Business Administration from Prestige University. Top skills include Agile, Scrum, Leadership, Product management, Product strategy alignment, User feedback analysis, Data-driven decision-making, Iterative development, Industry trend analysis, Roadmapping and prioritization, Complex concept explanation.",
+    "Experience": [
+      {
+        "title": "Product Manager",
+        "company": "Innovate Inc.",
+        "duration_years": 5,
+        "description": "Responsible for managing product development process, implementing Agile and Scrum methodologies, and providing leadership to the team. Led cross-functional teams to deliver high-impact products. Successfully launched a flagship product that increased user retention by 35%. Managed projects including a mobile app redesign for a tech startup and a SaaS platform for a financial services company.",
+        "source": []
+      }
+    ],
+    "Education": [
+      {
+        "degree": "MBA in Business Administration",
+        "institution": "Prestige University",
+        "year": 2015,
+        "source": [
+          "LinkedIn"
+        ]
+      }
+    ],
+    "Skills": [
+      {
+        "skill": "Agile",
+        "source": [
+          "CV",
+          "LinkedIn"
+        ]
+      },
+      {
+        "skill": "Complex Concept Explanation",
+        "source": []
+      },
+      {
+        "skill": "Data-Driven Decision-Making",
+        "source": []
+      },
+      {
+        "skill": "Industry Trend Analysis",
+        "source": []
+      },
+      {
+        "skill": "Iterative Development",
+        "source": []
+      },
+      {
+        "skill": "Leadership",
+        "source": [
+          "CV",
+          "LinkedIn"
+        ]
+      },
+      {
+        "skill": "Product Management",
+        "source": []
+      },
+      {
+        "skill": "Product Strategy Alignment",
+        "source": []
+      },
+      {
+        "skill": "Roadmapping And Prioritization",
+        "source": []
+      },
+      {
+        "skill": "Scrum",
+        "source": [
+          "CV",
+          "LinkedIn"
+        ]
+      },
+      {
+        "skill": "User Feedback Analysis",
+        "source": []
+      }
+    ]
+  }
+}
